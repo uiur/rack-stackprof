@@ -8,6 +8,7 @@ class Rack::Stackprof
     @sampling_interval_microseconds = options.fetch(:sampling_interval_microseconds)
     @last_profiled_at = nil
     @result_directory = options.fetch(:result_directory) # for `StackProf::Middleware.save`
+    @raw = options.fetch(:raw, false)
   end
 
   def call(env)
@@ -30,7 +31,7 @@ class Rack::Stackprof
 
   def with_profile(env)
     started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_microsecond)
-    StackProf.start(mode: :wall, interval: @sampling_interval_microseconds)
+    StackProf.start(mode: :wall, interval: @sampling_interval_microseconds, raw: @raw)
     yield
   ensure
     StackProf.stop
